@@ -166,7 +166,13 @@ app.delete("/all",async(req,res)=>{
   const data=await UserModel.deleteMany({})
  
 })
+app.get("/verifyuser",verifyJWT,(req,res)=>{
+  if(req.address){
+    return res.send({success:true,isAuthenticated:true})
+  }
+  return res.send({success:true,isAuthenticated:false})
 
+})
 
 
 app.use(router)
