@@ -53,7 +53,7 @@ console.log({user});
     if (user && user.messageToSign) {
 
       // messageToSign already exists for that particular wallet address
-      messageToSign = user.data().messageToSign;
+      messageToSign = user.messageToSign;
     } else {
     //   admin.firestore().collection("users").doc(address).set(
     //     {
