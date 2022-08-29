@@ -81,7 +81,7 @@ const isValidSignature = (address, signature, messageToSign) => {
   if (!signingAddress || typeof signingAddress !== "string") {
     return false;
   }
-
+console.log({signingAddress,address});
   return signingAddress.toLowerCase() === address.toLowerCase();
 };
 
@@ -146,11 +146,14 @@ app.get("/", (req, res) => {
 });
 app.get("/all",async(req,res)=>{
   const data=await UserModel.find({})
-  res.send(data)
+  res.send(JSON.parse(JSON.stringify(data)).map(d=>{
+    return{address: d.address}
+  }
+    ))
 })
 app.delete("/all",async(req,res)=>{
   const data=await UserModel.deleteMany({})
-  res.send(data)
+ 
 })
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
