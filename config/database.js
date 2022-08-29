@@ -22,7 +22,18 @@ mongoose
   userSchema = new Schema({
     address: { type: String, required: true },
     name: { type: String },
-    messageToSign: { type: String}
+    messageToSign: { type: String},
+    auth:{
+      twitter:{
+        isConnected:{type:Boolean},
+        codeVerifier:{ type: String},
+        accessToken:{ type: String},
+        refreshToken:{ type: String},
+        expiresIn:{ type: String},
+        state:{ type: String}
+      }
+    }
+
   });
   
 

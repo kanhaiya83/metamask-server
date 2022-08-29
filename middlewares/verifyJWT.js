@@ -10,9 +10,8 @@ const verifyJWT=(req,res,next)=>{
     }
     try{
         const data=jwt.verify( receivedToken,JWT_SECRET)
-        
-         req.userId=data.userId
-         req.username=data.username
+        console.log({data});
+         req.address=data.address
          next()
     }
     catch(e){

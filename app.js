@@ -8,17 +8,16 @@ require("dotenv").config()
 const baseUrl = process.env.BASE_URL;
 const callback = `${baseUrl}/callback`;
 const state = "my-state";
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 4000;
 
 const app = express();
 app.use(cors())
-
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
 
 if (!client_id) throw "Please add a CLIENT_ID environment variable in the Secrets section";
 if (!client_secret) throw "Please add a CLIENT_SECRET environment variable in the Secrets section";
-app.use("/user",userRoute)
+// app.use("/user",userRoute)
 // const authClient = new auth.OAuth2User({
 //   client_id,
 //   client_secret,

@@ -3,10 +3,13 @@ const express = require("express");
 const cors = require("cors");
 const { recoverPersonalSignature } = require("eth-sig-util");
 const Web3 = require("web3");
+const { TwitterApi } = require("twitter-api-v2");
 const jwt = require("jsonwebtoken");
 // require("./utils/twitter")
 // const serviceAccount = require("./serviceAccountKey.json");
 const { UserModel } = require("./config/database");
+const verifyJWT = require("./middlewares/verifyJWT");
+const router = require("./routes/twitter");
 
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount),
@@ -44,10 +47,11 @@ const getMessageToSign = async (req, res) => {
     let messageToSign = `Wallet address: ${address} Nonce: ${randomString}`;
 
     // const user = await admin.firestore().collection("users").doc(address).get();
-    const user = await UserModel.find({address})
+    const user = await UserModel.findOne({address})
 
-
+console.log({user});
     if (user && user.messageToSign) {
+
       // messageToSign already exists for that particular wallet address
       messageToSign = user.data().messageToSign;
     } else {
@@ -59,7 +63,10 @@ const getMessageToSign = async (req, res) => {
     //       merge: true,
     //     }
     //   );
-    const savedUser=await UserModel({address,messageToSign}).save()
+    if(user){
+      await UserModel.updateOne({address},{messageToSign})
+    }
+    else{const savedUser=await UserModel({address,messageToSign}).save()}
     }
     return res.send({ messageToSign, error: null });
   } catch (error) {
@@ -151,10 +158,18 @@ app.get("/all",async(req,res)=>{
   }
     ))
 })
+app.get("/alll",async(req,res)=>{
+  const data=await UserModel.find({})
+res.send(data)  
+})
 app.delete("/all",async(req,res)=>{
   const data=await UserModel.deleteMany({})
  
 })
+
+
+
+app.use(router)
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
