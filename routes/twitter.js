@@ -100,8 +100,7 @@ router.get("/auth/twitter/disconnect",verifyJWT,async(req,res)=>{
 router.get("/auth/twitter/verify",verifyJWT,async(req,res)=>{
     const user=await UserModel.findOne({address:req.address})
     const isConnected=user?.auth?.twitter?.isConnected
-
-        console.log(user)
+console.log(user.auth)
     if(isConnected === true){
         return res.send({success:true})
     }

@@ -9,7 +9,8 @@ const jwt = require("jsonwebtoken");
 // const serviceAccount = require("./serviceAccountKey.json");
 const { UserModel } = require("./config/database");
 const verifyJWT = require("./middlewares/verifyJWT");
-const router = require("./routes/twitter");
+const twitterRouter = require("./routes/twitter");
+const telegramRouter = require("./routes/telegram");
 
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount),
@@ -175,7 +176,8 @@ app.get("/verifyuser",verifyJWT,(req,res)=>{
 })
 
 
-app.use(router)
+app.use(twitterRouter)
+app.use(telegramRouter)
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });

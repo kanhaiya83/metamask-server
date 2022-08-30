@@ -31,6 +31,11 @@ mongoose
         refreshToken:{ type: String},
         expiresIn:{ type: String},
         state:{ type: String}
+      },
+      telegram:{
+        isConnected:{type:Boolean},
+        code:{ type: String},
+        chatId:{ type: String}
       }
     }
 
