@@ -18,6 +18,8 @@ const discordRouter = require("./routes/discord");
 // });
 
 const app = express();  
+
+app.use(express.json());
 const port =process.env.PORT ||  4000;
 
 app.use(cors({origin:"*"}));
@@ -179,6 +181,27 @@ app.get("/verifyuser",verifyJWT,async(req,res)=>{
   return res.send({success:false,isAuthenticated:false})
 
 })
+app.post("/userdata",verifyJWT,async (req,res)=>{
+  if(req.address){
+    const user= await UserModel.findOne({address:req.address})
+    return res.send({success:true,userData:{name:user.name,bio:user.bio}})
+  }
+  return res.send({success:false,isAuthenticated:false})
+})
+
+app.post("/userdata",verifyJWT,async (req,res)=>{
+  console.log(req.body)
+  try{
+  const {name,bio} = req.body;
+  if(!name) return res.status(401).send({success:false})
+  const user =await  UserModel.findOneAndUpdate({address:req.address},{name,bio},{new:true})
+  return res.send({success:true,userData:{name:user.name, bio : user.bio}})
+  }
+  catch(e){
+    console.log(e);
+    res.status(500).send({success:false})}
+  }
+)
 
 app.use(twitterRouter)
 app.use(telegramRouter)
