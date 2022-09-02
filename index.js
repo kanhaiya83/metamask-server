@@ -181,7 +181,7 @@ app.get("/verifyuser",verifyJWT,async(req,res)=>{
   return res.send({success:false,isAuthenticated:false})
 
 })
-app.post("/userdata",verifyJWT,async (req,res)=>{
+app.get("/userdata",verifyJWT,async (req,res)=>{
   if(req.address){
     const user= await UserModel.findOne({address:req.address})
     return res.send({success:true,userData:{name:user.name,bio:user.bio}})
