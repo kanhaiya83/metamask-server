@@ -20,7 +20,7 @@ const discordRouter = require("./routes/discord");
 const app = express();  
 const port =process.env.PORT ||  4000;
 
-app.use(cors());
+app.use(cors({origin:"*"}));
 
 const isValidEthAddress = (address) => Web3.utils.isAddress(address);
 
