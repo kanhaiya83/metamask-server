@@ -10,104 +10,103 @@ const { TwitterApi } = require("twitter-api-v2");
 
 const {
   CONSUMER_KEY,
-  CONSUMER_KEY_SECRET,
+  CONSUMER_SECRET,
   CALLBACK_URL,
   CLIENT_ID,
   CLIENT_SECRET,
 } = process.env;
 
 router.get("/callback", async (req, res) => {
-  // Extract state and code from query string
-  const { state, code } = req.query;
-  console.log({ code });
-  // Get the saved codeVerifier from session
-  // const { codeVerifier, state: sessionState } = req.session;
-
-  // if (!codeVerifier || !state || !sessionState || !code) {
-  //   return res.status(400).send('You denied the app or your session expired!');
-  // }
-  // if (state !== sessionState) {
-  //   return res.status(400).send('Stored tokens didnt match!');
-  // }
-
-  // Obtain access token
-  const client2 = new TwitterApi({
-    clientId: CLIENT_ID,
-    clientSecret: CLIENT_SECRET,
+  const { oauth_token, oauth_verifier } = req.query;
+  
+  const user = await UserModel.findOne({
+    "auth.twitter.oauth_token": oauth_token,
   });
-  const user = await UserModel.findOne({ "auth.twitter.state": state });
-  const { codeVerifier } = user.auth.twitter;
-  client2
-    .loginWithOAuth2({ code, codeVerifier, redirectUri: CALLBACK_URL })
-    .then(
-      async ({
-        client: loggedClient,
-        accessToken,
-        refreshToken,
-        expiresIn,
-      }) => {
-        // {loggedClient} is an authenticated client in behalf of some user
-        // Store {accessToken} somewhere, it will be valid until {expiresIn} is hit.
-        // If you want to refresh your token later, store {refreshToken} (it is present if 'offline.access' has been given as scope)
+  const client = new TwitterApi({
+    appKey: CONSUMER_KEY,
+    appSecret: CONSUMER_SECRET,
+    accessToken: oauth_token,
+    accessSecret: user.auth.twitter.oauth_token_secret,
+  });
 
-        // Example request
-        await UserModel.updateOne(
-          { "auth.twitter.state": state },
-          {
-            auth: {
-              twitter: {
-                isConnected: true,
-                codeVerifier: "",
-                accessToken,
-                refreshToken,
-                expiresIn,
-              },
-            },
-          }
-        );
-        const { data: userObject } = await loggedClient.v2.me();
+  client
+    .login(oauth_verifier)
+    .then(async ({ client: loggedClient, accessToken, accessSecret }) => {
+      await UserModel.updateOne(
+        { "auth.twitter.oauth_token":oauth_token },
+        {$set:{"auth.twitter":{
+          isConnected: true,
+          accessToken,
+          accessSecret,
+          oauth_verifier
+        }}}
+      );
+      const { data: userObject } = await loggedClient.v2.me();
         console.log(userObject);
         res.send("<script>window.close();</script >");
-      }
-    )
-    .catch();
+    })
+    .catch((e) => {console.log(e);res.status(403).send("Invalid verifier or access tokens!")});
 });
 
 router.get("/auth/twitter", verifyJWT, async (req, res) => {
   const client = new TwitterApi({
-    clientId: CLIENT_ID,
-    clientSecret: CLIENT_SECRET,
+    appKey: CONSUMER_KEY,
+    appSecret: CONSUMER_SECRET,
   });
 
-  const data = client.generateOAuth2AuthLink(CALLBACK_URL, {
-    scope: ["tweet.read", "users.read", "offline.access"],
-  });
+  const data = await client.generateAuthLink(CALLBACK_URL);
   console.log(data);
   await UserModel.updateOne(
     { address: req.address },
     {
-      auth: { twitter: { codeVerifier: data.codeVerifier, state: data.state } },
+      $set: {
+        "auth.twitter": {
+          oauth_token: data.oauth_token,
+          oauth_token_secret: data.oauth_token_secret,
+        },
+      },
     }
   );
 
   res.send({ success: true, ...data });
 });
 
-router.get("/auth/twitter/disconnect",verifyJWT,async(req,res)=>{
-    const user=await UserModel.updateOne({address:req.address},{auth:{twitter:{}}})
-    return res.send({success:true})
-})
-router.get("/auth/twitter/verify",verifyJWT,async(req,res)=>{
-    const user=await UserModel.findOne({address:req.address})
-    const isConnected=user?.auth?.twitter?.isConnected
-console.log(user.auth)
-    if(isConnected === true){
-        return res.send({success:true})
-    }
-    else{
-        return res.send({success:false})
+router.get("/auth/twitter/disconnect", verifyJWT, async (req, res) => {
+  const user = await UserModel.updateOne(
+    { address: req.address },
+    { $set : {"auth.twitter":{isConnected:false}} }
+  );
+  return res.send({ success: true });
+});
+router.get("/auth/twitter/verify", verifyJWT, async (req, res) => {
+  const user = await UserModel.findOne({ address: req.address });
+  const isConnected = user?.auth?.twitter?.isConnected;
+  console.log(user.auth);
+  if (isConnected === true) {
+    return res.send({ success: true });
+  } else {
+    return res.send({ success: false });
+  }
+});
 
-    }
+router.get("/test",verifyJWT,async(req,res)=>{
+  const user=await UserModel.findOne({address:req.address})
+  const {accessToken,accessSecret,oauth_verifier}=user.auth.twitter
+  console.log({accessToken,accessSecret,oauth_verifier})
+  const client3 = new TwitterApi({
+    appKey: CONSUMER_KEY,
+    appSecret: CONSUMER_SECRET,
+    accessToken,
+    accessSecret
+  });
+client3.v2.me().then(console.log)
+  // client3.login(oauth_verifier)
+  //   .then(async ({ client: loggedClient, accessToken, accessSecret }) => {
+  //     // loggedClient is an authenticated client in behalf of some user
+  //     // Store accessToken & accessSecret somewhere
+  //     console.log(await loggedClient.currentUser() );
+  //   })
+  //   .catch((e) => res.status(403).send(e));
 })
 
 module.exports = router;

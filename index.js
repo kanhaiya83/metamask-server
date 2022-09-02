@@ -11,12 +11,13 @@ const { UserModel } = require("./config/database");
 const verifyJWT = require("./middlewares/verifyJWT");
 const twitterRouter = require("./routes/twitter");
 const telegramRouter = require("./routes/telegram");
+const discordRouter = require("./routes/discord");
 
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount),
 // });
 
-const app = express();
+const app = express();  
 const port =process.env.PORT ||  4000;
 
 app.use(cors());
@@ -167,17 +168,21 @@ app.delete("/all",async(req,res)=>{
   const data=await UserModel.deleteMany({})
  
 })
-app.get("/verifyuser",verifyJWT,(req,res)=>{
+app.get("/verifyuser",verifyJWT,async(req,res)=>{
   if(req.address){
-    return res.send({success:true,isAuthenticated:true})
+    const user= await UserModel.findOne({address:req.address})
+    const twitter= (user?.auth?.twitter?.isConnected === true) ? true :false
+    const discord= (user?.auth?.discord?.isConnected === true) ? true :false
+    const telegram= (user?.auth?.telegram?.isConnected === true) ? true :false
+    return res.send({success:true,isAuthenticated:true,connectedProfiles:{twitter,discord,telegram},userData:{name:user.name,bio:user.bio}})
   }
-  return res.send({success:true,isAuthenticated:false})
+  return res.send({success:false,isAuthenticated:false})
 
 })
 
-
 app.use(twitterRouter)
 app.use(telegramRouter)
+app.use(discordRouter)
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });

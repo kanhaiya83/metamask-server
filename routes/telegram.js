@@ -36,7 +36,7 @@ router.get("/auth/telegram",verifyJWT,async (req,res)=>{
    try{ const address=req.address
     debug({address})
         const randomCode=randomstring.generate({length:10,capitalization:"uppercase"});
-        const user=await UserModel.findOneAndUpdate({address},{auth:{telegram:{code:randomCode}}})
+        const user=await UserModel.findOneAndUpdate({address},{$set : {"auth.telegram":{code:randomCode}}})
         const formattedCode="verify "+randomCode
         return res.send({success:true,code:formattedCode})  }      
         catch(e){
@@ -60,7 +60,7 @@ router.get("/auth/telegram/verify",verifyJWT,async (req,res)=>{
 })
 router.get("/auth/telegram/disconnect",verifyJWT,async (req,res)=>{
     try{const {address}=req
-    const update=await UserModel.updateOne({address},{auth:{telegram:{isConnected:false,code:null,chatId:null}}})
+    const update=await UserModel.updateOne({address},{$set:{"auth.telegram":{isConnected:false,code:null,chatId:null}}})
     return res.send({success:true})}
     catch(e){
         return res.status(500).send({success:false,error:e,message:"Some error occurred!"})
