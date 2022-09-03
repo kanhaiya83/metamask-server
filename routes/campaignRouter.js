@@ -7,9 +7,9 @@ const app = express();
 app.use(express.json());
 const campaignRouter = express.Router();
 
-const cors = require("cors");
+// const cors = require("cors");
 
-app.use(cors());
+// app.use(cors());
 campaignRouter.get("/campaign/all/delete",async(req,res)=>{
 await CampaignModel.deleteMany({})
 

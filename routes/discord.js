@@ -3,9 +3,9 @@ const verifyJWT = require("../middlewares/verifyJWT");
 const express = require("express");
 require("dotenv").config();
 const app = express();
-const cors = require("cors");
+// const cors = require("cors");
 
-app.use(cors());
+// app.use(cors());
 
 app.use(express.json());
 const shortid = require('shortid');const router = express.Router();

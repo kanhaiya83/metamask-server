@@ -8,9 +8,9 @@ app.use(express.json());
 const router = express.Router();
 const { TwitterApi } = require("twitter-api-v2");
 
-const cors = require("cors");
+// const cors = require("cors");
 
-app.use(cors());
+// app.use(cors());
 const {
   CONSUMER_KEY,
   CONSUMER_SECRET,

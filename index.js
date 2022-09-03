@@ -24,7 +24,8 @@ const app = express();
 app.use(express.json());
 const port =process.env.PORT ||  4000;
 
-app.use(cors());
+// app.use(cors(origin));
+app.options('*', cors()) 
 
 const isValidEthAddress = (address) => Web3.utils.isAddress(address);
 

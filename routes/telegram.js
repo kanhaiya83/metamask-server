@@ -9,9 +9,9 @@ require("dotenv").config();
 const app = express();
 app.use(express.json());
 
-const cors = require("cors");
+// const cors = require("cors");
 
-app.use(cors());
+// app.use(cors());
 const router = express.Router();
 
 
