@@ -3,7 +3,6 @@ const express = require("express");
 const cors = require("cors");
 const { recoverPersonalSignature } = require("eth-sig-util");
 const Web3 = require("web3");
-const { TwitterApi } = require("twitter-api-v2");
 const jwt = require("jsonwebtoken");
 // require("./utils/twitter")
 // const serviceAccount = require("./serviceAccountKey.json");
