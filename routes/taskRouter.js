@@ -11,7 +11,6 @@ require("dotenv").config()
 
 // app.use(cors());
 const DiscordOauth2 = require("discord-oauth2");
-const { default: VHeaderLayout } = require("../../metamast-campaign/src/Layout/layout");
 const oauth = new DiscordOauth2();
 
 const { SERVER_URL, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET ,  CONSUMER_KEY,
