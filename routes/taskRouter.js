@@ -3,8 +3,7 @@ const jwt = require("jsonwebtoken");
 const { CampaignModel, UserModel, TelegramModel } = require("../config/database");
 const { TwitterApi } = require("twitter-api-v2");
 const verifyJWT = require("../middlewares/verifyJWT");
-const app = express();
-app.use(express.json());
+
 const taskRouter = express.Router();
 require("dotenv").config()
 // const cors = require("cors");

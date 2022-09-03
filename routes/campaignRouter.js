@@ -3,8 +3,6 @@ const jwt = require("jsonwebtoken");
 
 const { CampaignModel, UserModel } = require("../config/database");
 const verifyJWT = require("../middlewares/verifyJWT");
-const app = express();
-app.use(express.json());
 const campaignRouter = express.Router();
 
 // const cors = require("cors");

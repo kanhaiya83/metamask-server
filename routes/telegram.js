@@ -6,12 +6,6 @@ const  randomstring = require("randomstring");
 
 const express = require("express");
 require("dotenv").config();
-const app = express();
-app.use(express.json());
-
-// const cors = require("cors");
-
-// app.use(cors());
 const router = express.Router();
 
 

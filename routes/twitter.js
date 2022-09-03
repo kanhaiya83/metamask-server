@@ -2,15 +2,11 @@ const { UserModel } = require("../config/database");
 const verifyJWT = require("../middlewares/verifyJWT");
 const express = require("express");
 require("dotenv").config();
-const app = express();
-app.use(express.json());
 
 const router = express.Router();
 const { TwitterApi } = require("twitter-api-v2");
 
-// const cors = require("cors");
 
-// app.use(cors());
 const {
   CONSUMER_KEY,
   CONSUMER_SECRET,

@@ -22,8 +22,18 @@ const app = express();
 
 app.use(express.json());
 const port =process.env.PORT ||  4000;
+const corsOptions = {
+  origin: '*'
+}
+app.use(cors(corsOptions))
 
-app.use(cors());
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", '*');
+    res.header("Access-Control-Allow-Credentials", true);
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
+    next();
+});
 
 const isValidEthAddress = (address) => Web3.utils.isAddress(address);
 
