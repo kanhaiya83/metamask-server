@@ -11,6 +11,7 @@ const cors = require("cors");
 
 app.use(cors());
 const DiscordOauth2 = require("discord-oauth2");
+const { default: VHeaderLayout } = require("../../metamast-campaign/src/Layout/layout");
 const oauth = new DiscordOauth2();
 
 const { SERVER_URL, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET ,  CONSUMER_KEY,
@@ -94,6 +95,7 @@ taskRouter.get("/task/discord",verifyJWT,async (req,res)=>{
         console.log(user,user.completedTasks)
         return res.send({ success: true ,completedTasks:user.completedTasks});
       } catch (e) {
+        console.log(e)
         return res.status(500).send({ success: false });
       }
 })
@@ -150,7 +152,7 @@ taskRouter.get("/task/twitterretweet",verifyJWT,async (req,res)=>{
   }
 )
 taskRouter.get("/task/telegram",verifyJWT,async (req,res)=>{
-  const {chatId,taskId} = req.query
+  try{const {chatId,taskId} = req.query
   const user= await UserModel.findOne({address:req.address})
   if(user.auth.telegram.isConnected === false){
     return res.status(403).send({success:false})
@@ -161,7 +163,11 @@ taskRouter.get("/task/telegram",verifyJWT,async (req,res)=>{
     const user=await UserModel.findOneAndUpdate({address:req.address},{$push:{completedTasks:taskId}},{new:true})
     return res.send({success:true,completedTasks:user.completedTasks})
   }
-return res.send({success:false})
+return res.send({success:false})}
+catch(e){
+  console.log(e)
+  return res.status(500).send({success:false})
+}
 })
 taskRouter.get("/task/all/delete",async (req,res)=>{
   const user= await UserModel.updateMany({},{completedTasks:[]})
