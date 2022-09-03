@@ -1,12 +1,18 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+
 const { CampaignModel, UserModel } = require("../config/database");
 const verifyJWT = require("../middlewares/verifyJWT");
 const app = express();
 app.use(express.json());
 const campaignRouter = express.Router();
+
+const cors = require("cors");
+
+app.use(cors());
 campaignRouter.get("/campaign/all/delete",async(req,res)=>{
 await CampaignModel.deleteMany({})
+
 res.send("success")
 })
 campaignRouter.get("/campaign/all",async(req,res)=>{

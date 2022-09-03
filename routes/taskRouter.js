@@ -7,6 +7,9 @@ const app = express();
 app.use(express.json());
 const taskRouter = express.Router();
 
+const cors = require("cors");
+
+app.use(cors());
 const DiscordOauth2 = require("discord-oauth2");
 const oauth = new DiscordOauth2();
 
