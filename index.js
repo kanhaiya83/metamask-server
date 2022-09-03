@@ -12,6 +12,8 @@ const verifyJWT = require("./middlewares/verifyJWT");
 const twitterRouter = require("./routes/twitter");
 const telegramRouter = require("./routes/telegram");
 const discordRouter = require("./routes/discord");
+const campaignRouter = require("./routes/campaignRouter");
+const taskRouter = require("./routes/taskRouter");
 
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount),
@@ -172,13 +174,18 @@ app.delete("/all",async(req,res)=>{
 })
 app.get("/verifyuser",verifyJWT,async(req,res)=>{
   if(req.address){
-    const user= await UserModel.findOne({address:req.address})
-    const twitter= (user?.auth?.twitter?.isConnected === true) ? true :false
-    const discord= (user?.auth?.discord?.isConnected === true) ? true :false
-    const telegram= (user?.auth?.telegram?.isConnected === true) ? true :false
-    return res.send({success:true,isAuthenticated:true,connectedProfiles:{twitter,discord,telegram},userData:{name:user.name,bio:user.bio}})
+    const foundUser= await UserModel.findOne({address:req.address})
+    if(!foundUser) return res.status(404).send({success:false,message:"User not found!"})
+    const twitter= (foundUser?.auth?.twitter?.isConnected === true) ? true :false
+    const discord= (foundUser?.auth?.discord?.isConnected === true) ? true :false
+    const telegram= (foundUser?.auth?.telegram?.isConnected === true) ? true :false
+
+    const connectedProfiles={twitter,discord,telegram};
+    const userData={name:foundUser.name,bio:foundUser.bio}
+    const completedTasks=foundUser.completedTasks || []
+    return res.send({success:true,isAuthenticated:true,connectedProfiles,userData,completedTasks})
   }
-  return res.send({success:false,isAuthenticated:false})
+  return res.send({success:false})
 
 })
 app.get("/userdata",verifyJWT,async (req,res)=>{
@@ -206,6 +213,8 @@ app.post("/userdata",verifyJWT,async (req,res)=>{
 app.use(twitterRouter)
 app.use(telegramRouter)
 app.use(discordRouter)
+app.use(campaignRouter)
+app.use(taskRouter)
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });

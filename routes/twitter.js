@@ -32,13 +32,15 @@ router.get("/callback", async (req, res) => {
   client
     .login(oauth_verifier)
     .then(async ({ client: loggedClient, accessToken, accessSecret }) => {
+      const {data}= await loggedClient.currentUserV2()
       await UserModel.updateOne(
         { "auth.twitter.oauth_token":oauth_token },
         {$set:{"auth.twitter":{
           isConnected: true,
           accessToken,
           accessSecret,
-          oauth_verifier
+          oauth_verifier,
+          username:data.username
         }}}
       );
       const { data: userObject } = await loggedClient.v2.me();
