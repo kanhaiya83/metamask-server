@@ -6,7 +6,7 @@ const verifyJWT = require("../middlewares/verifyJWT");
 const app = express();
 app.use(express.json());
 const taskRouter = express.Router();
-
+require("dotenv").config()
 // const cors = require("cors");
 
 // app.use(cors());
