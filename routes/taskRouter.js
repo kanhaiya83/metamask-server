@@ -1,6 +1,6 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const { CampaignModel, UserModel } = require("../config/database");
+const { CampaignModel, UserModel, TelegramModel } = require("../config/database");
 const { TwitterApi } = require("twitter-api-v2");
 const verifyJWT = require("../middlewares/verifyJWT");
 const app = express();
@@ -146,6 +146,24 @@ taskRouter.get("/task/twitterretweet",verifyJWT,async (req,res)=>{
     
   }
 )
+taskRouter.get("/task/telegram",verifyJWT,async (req,res)=>{
+  const {chatId,taskId} = req.query
+  const user= await UserModel.findOne({address:req.address})
+  if(user.auth.telegram.isConnected === false){
+    return res.status(403).send({success:false})
+  }
+  const userTelegramId=user.auth.telegram.chatId;
+  const foundGroupChat=await TelegramModel.findOne({chatId})
+  if(foundGroupChat && foundGroupChat.members.includes(userTelegramId)){
+    const user=await UserModel.findOneAndUpdate({address:req.address},{$push:{completedTasks:taskId}},{new:true})
+    return res.send({success:true,completedTasks:user.completedTasks})
+  }
+return res.send({success:false})
+})
+taskRouter.get("/task/all/delete",async (req,res)=>{
+  const user= await UserModel.updateMany({},{completedTasks:[]})
+  res.send("success")
+})
 
 
 module.exports= taskRouter

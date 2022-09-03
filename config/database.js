@@ -67,6 +67,8 @@ mongoose
         discordInviteLink:{type:String},
         discordServerName:{type:String},
         telegramGroupName:{type:String},
+        telegramChatId:{type:String},
+        telegramGroupLink:{type:String},
         twitterAccountName:{type:String},
         telegramGroup:{type:String},
         twitterAccountUsername:{type:String},
@@ -78,12 +80,16 @@ mongoose
     ]
     
   })
-
+const TelegramSchema=new Schema({
+  chatId:{type:String},
+  members:[{type:String}]
+})
 const UserModel = mongoose.model('User', userSchema);
 const CampaignModel = mongoose.model('Campaign', campaignSchema);
+const TelegramModel = mongoose.model('Telegram', TelegramSchema);
 
 
 
 
 
-module.exports = {UserModel,CampaignModel};
+module.exports = {UserModel,CampaignModel,TelegramModel};

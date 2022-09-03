@@ -1,4 +1,4 @@
-const { UserModel } = require("../config/database");
+const { UserModel, TelegramModel } = require("../config/database");
 const verifyJWT = require("../middlewares/verifyJWT");
 const TelegramBot = require('node-telegram-bot-api');
 var debug = require('debug')('telegram-router') 
@@ -15,10 +15,18 @@ const router = express.Router();
 
 const {TELEGRAM_SECRET_TOKEN} = process.env;
 
-const bot = new TelegramBot(TELEGRAM_SECRET_TOKEN, {polling: true});
-
+ const bot = new TelegramBot(TELEGRAM_SECRET_TOKEN, {polling: true});
 
 bot.on('message', async(msg) => {
+    if(msg.text==="/getcode"){
+        bot.sendMessage(msg.chat.id,msg.chat.id)
+    }
+    console.log(msg);
+    if(msg.chat.type==="group" || msg.chat.type==="supergroup"){
+        if(msg.new_chat_member && !(msg.new_chat_member.is_bot)){
+        const chatGroup= await TelegramModel.findOneAndUpdate({chatId:(msg.chat.id).toString()},{$push:{members:msg.new_chat_member.id.toString()}},{upsert:true,new:true})
+        }
+    }
     if(msg.chat.type === "private" && msg.text.split(" ")[0]==="verify"){
         
             const verificationCode=msg.text.split(" ")[1]
@@ -32,6 +40,15 @@ bot.on('message', async(msg) => {
 
     }
   });
+
+  router.get("/telegram/all",async (req,res)=>{
+    const data=await TelegramModel.find({})
+    res.send(data)
+  })
+  router.get("/telegram/all/delete",async (req,res)=>{
+    const data=await TelegramModel.deleteMany({})
+    res.send(data)
+  })
 router.get("/auth/telegram",verifyJWT,async (req,res)=>{
    try{ const address=req.address
     debug({address})
@@ -67,4 +84,4 @@ router.get("/auth/telegram/disconnect",verifyJWT,async (req,res)=>{
     }
 })
 
-module.exports = router
+module.exports = {bot,router}
