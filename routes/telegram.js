@@ -28,7 +28,7 @@ bot.on('message', async(msg) => {
         
             const verificationCode=msg.text.split(" ")[1]
             debug("Verification code received:",verificationCode)
-            const foundUser=await UserModel.findOneAndUpdate({"auth.telegram.code":verificationCode},{auth:{telegram:{chatId:msg.from.id,isConnected:true,code:null}}})
+            const foundUser=await UserModel.findOneAndUpdate({"auth.telegram.code":verificationCode},{$set:{"auth.telegram":{chatId:msg.from.id,isConnected:true,code:null}}})
             if(!foundUser){
               return bot.sendMessage(msg.chat.id,"Invalid Code! Please try again!")  
         }
@@ -62,7 +62,6 @@ router.get("/auth/telegram/verify",verifyJWT,async (req,res)=>{
     try{const {address}=req
     const user=await UserModel.findOne({address})
     const isConnected=user?.auth?.telegram?.isConnected
-    debug(user.auth)
     if(isConnected === true){
         return res.send({success:true})
     }
