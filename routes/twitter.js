@@ -56,7 +56,7 @@ router.get("/auth/twitter", verifyJWT, async (req, res) => {
     appSecret: CONSUMER_SECRET,
   });
 
-  const data = await client.generateAuthLink(CALLBACK_URL);
+  const data = await client.generateAuthLink(CALLBACK_URL,{linkMode:"authorize"});
   console.log(data);
   await UserModel.updateOne(
     { address: req.address },
