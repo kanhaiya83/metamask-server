@@ -144,17 +144,16 @@ const getJWT = async (req, res) => {
     }
     await UserModel.updateOne({address},{messageToSign:null})
 
-    // Delete messageToSign as it is for 1 time use only
-    // admin.firestore().collection("users").doc(address).set(
-    //   {
-    //     messageToSign: null,
-    //   },
-    //   {
-    //     merge: true,
-    //   }
-    // );
+    
+      const twitter= (user?.auth?.twitter?.isConnected === true) ? true :false
+      const discord= (user?.auth?.discord?.isConnected === true) ? true :false
+      const telegram= (user?.auth?.telegram?.isConnected === true) ? true :false
+  
+      const connectedProfiles={twitter,discord,telegram};
+      const userData={name:user.name,bio:user.bio}
+      const completedTasks=user.completedTasks || []
+      return res.send({authToken,success:true,isAuthenticated:true,connectedProfiles,userData,completedTasks})    
 
-    return res.send({ authToken, error: null });
   } catch (error) {
     console.log(error);
     return res.send({ error: "server_error" });
@@ -167,13 +166,6 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 app.get("/all",async(req,res)=>{
-  const data=await UserModel.find({})
-  res.send(JSON.parse(JSON.stringify(data)).map(d=>{
-    return{address: d.address}
-  }
-    ))
-})
-app.get("/alll",async(req,res)=>{
   const data=await UserModel.find({})
 res.send(data)  
 })

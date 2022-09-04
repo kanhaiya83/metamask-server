@@ -172,5 +172,13 @@ taskRouter.get("/task/all/delete",async (req,res)=>{
   res.send("success")
 })
 
+taskRouter.get("/reset/all",async (req,res)=>{
+   await UserModel.updateMany({},{completedTasks:[]})
+   await TelegramModel.updateMany({},{members:[]})
+   await CampaignModel.deleteMany({})
+
+  res.send("success")
+})
+
 
 module.exports= taskRouter
