@@ -16,6 +16,7 @@ const {
 } = process.env;
 
 router.get("/callback", async (req, res) => {
+  console.log(req.protocol + '://' + req.get('host') + req.originalUrl)
   const { oauth_token, oauth_verifier } = req.query;
   
   const user = await UserModel.findOne({
