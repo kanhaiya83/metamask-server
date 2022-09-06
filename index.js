@@ -184,7 +184,8 @@ app.get("/verifyuser",verifyJWT,async(req,res)=>{
     const connectedProfiles={twitter,discord,telegram};
     const userData={name:foundUser.name,bio:foundUser.bio}
     const completedTasks=foundUser.completedTasks || []
-    return res.send({success:true,isAuthenticated:true,connectedProfiles,userData,completedTasks})
+    const joinedCampaigns=foundUser.campaignsJoined || []
+    return res.send({success:true,isAuthenticated:true,connectedProfiles,userData,completedTasks,joinedCampaigns})
   }
   return res.send({success:false})
 

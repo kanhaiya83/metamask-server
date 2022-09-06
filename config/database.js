@@ -51,7 +51,14 @@ mongoose
         state:{ type: String}
       },
     },
-    completedTasks:[{type:String}]
+    completedTasks:[],
+    campaignsJoined:[
+      { campaignId:{type:String},
+        allTasksCompleted:{type:Boolean,default:false},
+        tasksCompleted:[{type:String}],
+        completedTime:{type:String},
+      }
+    ]
 
   });
   const campaignSchema=new Schema({
@@ -60,6 +67,7 @@ mongoose
     image:{type:String},
     startTime:{type:String},
     endTime:{type:String},
+    totalPoints:{type:Number},
     tasks:[
       {
         taskType:{type:String,required:true},
@@ -73,7 +81,8 @@ mongoose
         telegramGroup:{type:String},
         twitterAccountUsername:{type:String},
         isCompleted:{type : Boolean, default:false},
-        tweetId:{type:String} 
+        tweetId:{type:String} ,
+        points:{type:Number}
 
 
       }

@@ -15,13 +15,14 @@ const {TELEGRAM_SECRET_TOKEN} = process.env;
  const bot = new TelegramBot(TELEGRAM_SECRET_TOKEN, {polling: true});
 
 bot.on('message', async(msg) => {
+    console.log(msg);
+
     if(msg.text==="/getcode"){
         bot.sendMessage(msg.chat.id,msg.chat.id)
     }
-    console.log(msg);
     if(msg.chat.type==="group" || msg.chat.type==="supergroup"){
         if(msg.new_chat_member && !(msg.new_chat_member.is_bot)){
-        const chatGroup= await TelegramModel.findOneAndUpdate({chatId:(msg.chat.id).toString()},{$push:{members:msg.new_chat_member.id.toString()}},{upsert:true,new:true})
+        const chatGroup= await TelegramModel.findOneAndUpdate({chatId:(msg.chat.id).toString()},{$addToSet:{members:msg.new_chat_member.id.toString()}},{upsert:true,new:true})
         }
     }
     if(msg.chat.type === "private" && msg.text.split(" ")[0]==="verify"){
