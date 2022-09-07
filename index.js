@@ -9,7 +9,7 @@ const jwt = require("jsonwebtoken");
 const { UserModel } = require("./config/database");
 const verifyJWT = require("./middlewares/verifyJWT");
 const twitterRouter = require("./routes/twitter");
-const {router:telegramRouter} = require("./routes/telegram");
+// const {router:telegramRouter} = require("./routes/telegram");
 const discordRouter = require("./routes/discord");
 const campaignRouter = require("./routes/campaignRouter");
 const taskRouter = require("./routes/taskRouter");
@@ -213,7 +213,7 @@ app.post("/userdata",verifyJWT,async (req,res)=>{
 )
 
 app.use(twitterRouter)
-app.use(telegramRouter)
+// app.use(telegramRouter)
 app.use(discordRouter)
 app.use(campaignRouter)
 app.use(taskRouter)

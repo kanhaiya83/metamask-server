@@ -57,6 +57,8 @@ mongoose
         allTasksCompleted:{type:Boolean,default:false},
         tasksCompleted:[{type:String}],
         completedTime:{type:String},
+        hasClaimed:{type:Boolean,default:false},
+        totalPoints:{type:Number}
       }
     ]
 

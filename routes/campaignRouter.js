@@ -21,15 +21,20 @@ campaignRouter.get("/campaign/all",async(req,res)=>{
     
     }
     })
-    campaignRouter.post("/campaign",async(req,res)=>{
+campaignRouter.post("/campaign",async(req,res)=>{
+    console.log(req.body)
     try{const newCampaign=new CampaignModel(req.body);
+
         const savedCampaign=await newCampaign.save();
     return res.send({success:true,savedCampaign})}
     catch(e){
+        console.log(e)
     return res.status(500).send({success:false})
     
     }
     })
+
+
 
 
 module.exports = campaignRouter
