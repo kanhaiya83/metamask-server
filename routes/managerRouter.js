@@ -14,7 +14,7 @@ const verifyManagerJWT = require("../middlewares/verifyManagerJWT");
 const managerRouter = express.Router();
 require("dotenv").config();
 
-const { JWT_SECRET } = process.env;
+const { MANAGER_JWT_SECRET } = process.env;
 
 managerRouter.get("/manager/verify", verifyManagerJWT, (req, res) => {
   res.send({ success: true });
@@ -27,7 +27,7 @@ managerRouter.post("/manager/login", async (req, res) => {
     if(!foundManager) return res.send({success:false, message:"No user found with that email"})
 
     if (passwordReceived === foundManager.password) {
-      const managerAuthToken = await jwt.sign({email:foundManager.email}, JWT_SECRET);
+      const managerAuthToken = await jwt.sign({email:foundManager.email}, MANAGER_JWT_SECRET);
       return res.send({ success: true, managerAuthToken });
     }
     else{

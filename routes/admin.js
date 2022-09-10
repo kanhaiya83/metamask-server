@@ -14,7 +14,7 @@ const verifyAdminJWT = require("../middlewares/verifyAdminJWT");
 const adminRouter = express.Router();
 require("dotenv").config();
 
-const { ADMIN_PASSWORD, JWT_SECRET } = process.env;
+const { ADMIN_PASSWORD, ADMIN_JWT_SECRET } = process.env;
 
 adminRouter.get("/admin/verify", verifyAdminJWT, (req, res) => {
   res.send({ success: true });
@@ -23,7 +23,7 @@ adminRouter.post("/admin/login", async (req, res) => {
   try {
     const password = req.body.password;
     if (password === ADMIN_PASSWORD) {
-      const adminAuthToken = await jwt.sign({}, JWT_SECRET);
+      const adminAuthToken = await jwt.sign({}, ADMIN_JWT_SECRET);
       return res.send({ success: true, adminAuthToken });
     }
     return res.send({ success: false });
