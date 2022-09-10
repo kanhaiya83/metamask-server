@@ -6,13 +6,15 @@ const Web3 = require("web3");
 const jwt = require("jsonwebtoken");
 // require("./utils/twitter")
 // const serviceAccount = require("./serviceAccountKey.json");
-const { UserModel } = require("./config/database");
+const { UserModel, CampaignModel,JoinedCampaignsModel, UnapprovedCampaignModel, CampaignManagerModel } = require("./config/database");
 const verifyJWT = require("./middlewares/verifyJWT");
 const twitterRouter = require("./routes/twitter");
 // const {router:telegramRouter} = require("./routes/telegram");
 const discordRouter = require("./routes/discord");
 const campaignRouter = require("./routes/campaignRouter");
 const taskRouter = require("./routes/taskRouter");
+const adminRouter = require("./routes/admin");
+const managerRouter = require("./routes/managerRouter");
 
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount),
@@ -152,7 +154,8 @@ const getJWT = async (req, res) => {
       const connectedProfiles={twitter,discord,telegram};
       const userData={name:user.name,bio:user.bio}
       const completedTasks=user.completedTasks || []
-      return res.send({authToken,success:true,isAuthenticated:true,connectedProfiles,userData,completedTasks})    
+      const joinedCampaigns=await JoinedCampaignsModel.find({address:req.address})
+      return res.send({authToken,success:true,isAuthenticated:true,connectedProfiles,userData,completedTasks,joinedCampaigns})    
 
   } catch (error) {
     console.log(error);
@@ -166,8 +169,13 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 app.get("/all",async(req,res)=>{
+  const managers= await CampaignManagerModel.find({})
+
   const data=await UserModel.find({})
-res.send(data)  
+  const campaigns= await CampaignModel.find({})
+  const joinedCampaigns= await JoinedCampaignsModel.find({})
+  const ucamp= await UnapprovedCampaignModel.find({})
+res.send({ managers,data,campaigns,joinedCampaigns,ucamp})  
 })
 app.delete("/all",async(req,res)=>{
   const data=await UserModel.deleteMany({})
@@ -184,7 +192,7 @@ app.get("/verifyuser",verifyJWT,async(req,res)=>{
     const connectedProfiles={twitter,discord,telegram};
     const userData={name:foundUser.name,bio:foundUser.bio}
     const completedTasks=foundUser.completedTasks || []
-    const joinedCampaigns=foundUser.campaignsJoined || []
+    const joinedCampaigns=await JoinedCampaignsModel.find({address:req.address})
     return res.send({success:true,isAuthenticated:true,connectedProfiles,userData,completedTasks,joinedCampaigns})
   }
   return res.send({success:false})
@@ -217,6 +225,8 @@ app.use(twitterRouter)
 app.use(discordRouter)
 app.use(campaignRouter)
 app.use(taskRouter)
+app.use(adminRouter)
+app.use(managerRouter)
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });

@@ -1,7 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 
-const { CampaignModel, UserModel } = require("../config/database");
+const { CampaignModel, UserModel, UnapprovedCampaignModel } = require("../config/database");
 const verifyJWT = require("../middlewares/verifyJWT");
 const campaignRouter = express.Router();
 
@@ -10,7 +10,7 @@ const campaignRouter = express.Router();
 // app.use(cors());
 campaignRouter.get("/campaign/all/delete",async(req,res)=>{
 await CampaignModel.deleteMany({})
-
+await UnapprovedCampaignModel.deleteMany({})
 res.send("success")
 })
 campaignRouter.get("/campaign/all",async(req,res)=>{
