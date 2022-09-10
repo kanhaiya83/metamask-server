@@ -21,13 +21,13 @@ managerRouter.get("/manager/verify", verifyManagerJWT, (req, res) => {
 });
 managerRouter.post("/manager/login", async (req, res) => {
   try {
-    const usernameReceived = req.body.username;
+    const emailReceived = req.body.email;
     const passwordReceived = req.body.password;
-    const foundManager = await CampaignManagerModel.findOne({username:usernameReceived})
-    if(!foundManager) return res.send({success:false, message:"No user found with that username"})
+    const foundManager = await CampaignManagerModel.findOne({email:emailReceived})
+    if(!foundManager) return res.send({success:false, message:"No user found with that email"})
 
     if (passwordReceived === foundManager.password) {
-      const managerAuthToken = await jwt.sign({username:foundManager.username}, JWT_SECRET);
+      const managerAuthToken = await jwt.sign({email:foundManager.email}, JWT_SECRET);
       return res.send({ success: true, managerAuthToken });
     }
     else{
@@ -48,7 +48,7 @@ managerRouter.get("/manager/data", verifyManagerJWT, async (req, res) => {
 
 managerRouter.post("/manager/campaign/new",verifyManagerJWT,async (req,res)=>{
   try{
-    const newCamp = new UnapprovedCampaignModel({...req.body,managerUsername:req.username})
+    const newCamp = new UnapprovedCampaignModel({...req.body,managerEmail:req.email})
     const saved =await  newCamp.save()
     await CampaignManagerModel.updateOne({username:req.username},{$addToSet:{campaignsCreated:saved._id}})
     res.send({success:true,addedCampaign:saved})

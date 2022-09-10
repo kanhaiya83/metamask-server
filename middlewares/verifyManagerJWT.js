@@ -9,7 +9,7 @@ const verifyManagerJWT=(req,res,next)=>{
     }
     try{
         const data=jwt.verify( receivedToken,JWT_SECRET)
-        req.username=data.username
+        req.email=data.email
         next()
     }
     catch(e){
