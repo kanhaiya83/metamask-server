@@ -1,5 +1,5 @@
 const jwt=require("jsonwebtoken")
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.ADMIN_JWT_SECRET;
 
 //verifies the jwt and add the user
 const verifyAdminJWT=(req,res,next)=>{
