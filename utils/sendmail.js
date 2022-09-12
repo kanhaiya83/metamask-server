@@ -8,6 +8,10 @@ const { google } = require('googleapis');
  GOOGLE_REDIRECT_URI,
  GOOGLE_REFRESH_TOKEN
 } = process.env
+console.log({GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET,
+    GOOGLE_REDIRECT_URI,
+    GOOGLE_REFRESH_TOKEN});
 async function sendMail(receiver,subject,body) {
   try {
     
