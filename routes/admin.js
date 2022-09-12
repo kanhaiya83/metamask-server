@@ -10,6 +10,7 @@ const {
   UnapprovedCampaignModel,
 } = require("../config/database");
 const verifyAdminJWT = require("../middlewares/verifyAdminJWT");
+const sendMail = require("../utils/sendmail");
 
 const adminRouter = express.Router();
 require("dotenv").config();
@@ -44,6 +45,8 @@ adminRouter.get("/admin/data", verifyAdminJWT, async (req, res) => {
 adminRouter.post("/admin/manager/new", verifyAdminJWT, async (req, res) => {
   const {name,email} = req.body
   try {
+    const foundManager= await CampaignManagerModel.findOne({email})
+    if(foundManager) return res.send({success:false,message:"Mail address already in use"})
     const temp = {
       username: randomstring.generate({ length: 8 }),
       password: randomstring.generate({ length: 16 }),
@@ -54,6 +57,10 @@ adminRouter.post("/admin/manager/new", verifyAdminJWT, async (req, res) => {
     };
     const newManager = new CampaignManagerModel(temp);
     const savedManager = await newManager.save();
+    const mailText=`Your Airlyft Campaign Manager password: "${savedManager.password}
+    Login here : https://demo-202.netlify.app/manager/login`
+
+    const r= await sendMail(email,"Airlyft Manager", mailText)
     return res.send({
       success: true,
       newManager: savedManager,
