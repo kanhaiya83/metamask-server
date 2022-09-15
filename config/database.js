@@ -110,6 +110,7 @@ const unapprovedCampaignSchema = new Schema({
   endTime: { type: String },
   totalPoints: { type: Number },
   managerEmail:{type:String},
+  platformPoints:{type:Number,default:0},
   tasks: [
     {
       taskType: { type: String, required: true },

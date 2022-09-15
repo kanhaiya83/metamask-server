@@ -1,4 +1,5 @@
 const express = require("express");
+const { admin } = require("googleapis/build/src/apis/admin");
 const jwt = require("jsonwebtoken");
 const randomstring = require("randomstring");
 
@@ -111,35 +112,27 @@ adminRouter.get(
     }
   }
 );
-adminRouter.post(
+adminRouter.get(
   "/admin/campaign/approve/:id",
   verifyAdminJWT,
   async (req, res) => {
     try {
-      console.log(req.body)
-      const {platformPoints}= req.body
       const campaignId = req.params.id;
-      let UnapprovedCamp = await UnapprovedCampaignModel.findOneAndDelete({_id:campaignId},{new:true});
+      let foundUnapprovedCampaign = await UnapprovedCampaignModel.findOne({_id:campaignId});
+      if(!foundUnapprovedCampaign) {
+        return res.send({ success: false, message: "No campaign found!" });
+      }
       
 
-      UnapprovedCamp= JSON.parse(JSON.stringify(UnapprovedCamp))
-      let totalPoints=UnapprovedCamp.totalPoints;
-      platformPoints.forEach(p=>{
-        totalPoints+=parseInt(p.platformPoints)
-      })
-      UnapprovedCamp.totalPoints = totalPoints
-      const updatedTasks= UnapprovedCamp.tasks.map(t=>{
-        platPts= parseInt(platformPoints.find(p=>(p.taskId === t._id)).platformPoints) ;
-        return {
-          ...t,points:parseInt(t.points)+platPts,platformPoints:platPts
-        }}
-)
-UnapprovedCamp.tasks = updatedTasks
-      const newCampaign= new CampaignModel(UnapprovedCamp)
+      foundUnapprovedCampaign= JSON.parse(JSON.stringify(foundUnapprovedCampaign))
+     delete foundUnapprovedCampaign._id
+      const newCampaign= new CampaignModel(foundUnapprovedCampaign)
+      await UnapprovedCampaignModel.deleteOne({_id:campaignId})
       const savedCampaign= await newCampaign.save() 
       return res.send({
         success: true,
-        savedCampaign
+        savedCampaign,
+        message:"Campaign approved!!"
       });
     } catch (e) {
       console.log(e)
@@ -149,4 +142,18 @@ UnapprovedCamp.tasks = updatedTasks
     }
   }
 );
+adminRouter.patch("/admin/campaign/unapproved/:campaignId",verifyAdminJWT,async (req,res)=>{
+      const {campaignId}= req.params
+      console.log(campaignId);
+      const data= req.body.updatedCampaignData
+        const updatedCampaign= await UnapprovedCampaignModel.findByIdAndUpdate(campaignId,data,{new:true})
+      return res.send({success:true,message : "Success!",updatedCampaign})
+})
+
+adminRouter.patch("/admin/campaign/:campaignId",verifyAdminJWT,async (req,res)=>{
+  const {campaignId}= req.params
+  const data= req.body.updatedCampaignData
+  const updatedCampaign= await CampaignModel.findByIdAndUpdate(campaignId,data,{new:true})
+  return res.send({success:true,message : "Success!",updatedCampaign})
+})
 module.exports = adminRouter;
