@@ -1,6 +1,19 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const multer  = require('multer')
+const {uploadImage} = require("./../utils/uploadImage")
+var path = require('path')
 
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/')
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)) //Appending extension
+  }
+})
+
+var upload = multer({ storage: storage });
 const {
   CampaignModel,
   UserModel,
@@ -46,9 +59,15 @@ managerRouter.get("/manager/data", verifyManagerJWT, async (req, res) => {
   }
 });
 
-managerRouter.post("/manager/campaign/new",verifyManagerJWT,async (req,res)=>{
+managerRouter.post("/manager/campaign/new",verifyManagerJWT,upload.single("campaign-image"),async (req,res)=>{
   try{
-    const newCamp = new UnapprovedCampaignModel({...req.body,managerEmail:req.email})
+    const imageName =req.file.filename
+    const result = await uploadImage(path.join(__dirname,"../uploads/",imageName))
+    console.log(result.url);
+    const data = (req.body)
+    const tasks = JSON.parse(req.body.tasks)
+    const campaignData = {...data,tasks,image:result.url,managerEmail:req.email}
+    const newCamp = new UnapprovedCampaignModel(campaignData)
     const saved =await  newCamp.save()
     await CampaignManagerModel.updateOne({username:req.username},{$addToSet:{campaignsCreated:saved._id}})
     res.send({success:true,addedCampaign:saved})
