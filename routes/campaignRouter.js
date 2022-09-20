@@ -31,13 +31,14 @@ campaignRouter.get("/campaign/all",async(req,res)=>{
     
     }
     })
-campaignRouter.post("/campaign",verifyAdminJWT,upload.single("campaign-image"),async(req,res)=>{
-    const imageName =req.file.filename
-    const result = await uploadImage(path.join(__dirname,"../uploads/",imageName))
-    console.log(result.url);
-    const data = (req.body)
-    const tasks = JSON.parse(req.body.tasks)
-    const campaignData = {...data,tasks,image:result.url}
+campaignRouter.post("/campaign",verifyAdminJWT,upload.fields([{name:"campaign-image"},{name:"brand-logo"}]),async(req,res)=>{
+  const campaignImage =req.files["campaign-image"][0].filename
+  const brandLogo =req.files["brand-logo"][0].filename
+  const {url:campaignImageURL} = await uploadImage(path.join(__dirname,"../uploads/",campaignImage))
+  const {url:brandLogoURL} = await uploadImage(path.join(__dirname,"../uploads/",brandLogo))
+  const data = (req.body)
+  const tasks = JSON.parse(req.body.tasks)
+  const campaignData = {...data,tasks,image:campaignImageURL,brandLogo:brandLogoURL}
     try{const newCampaign=new CampaignModel(campaignData);
 
         const savedCampaign=await newCampaign.save();

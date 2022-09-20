@@ -84,6 +84,12 @@ const campaignSchema = new Schema({
   totalPoints: { type: Number },
   brandName:{type:String},
   brandURL:{type:String},
+  brandLogo:{type:String},
+  entries:[{
+    userId:{type:String}
+  }],
+
+
   tasks: [
     {
       taskType: { type: String, required: true },
@@ -115,6 +121,7 @@ const unapprovedCampaignSchema = new Schema({
   platformPoints:{type:Number,default:0},
   brandName:{type:String},
   brandURL:{type:String},
+  brandLogo:{type:String},
   tasks: [
     {
       taskType: { type: String, required: true },

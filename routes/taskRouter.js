@@ -115,74 +115,15 @@ const markTaskComplete = async (address, campaignId, taskId) => {
 
     });
     const savedJoinedCampaign= await newJoinedCampaign.save()
+    await CampaignModel.updateOne({_id:campaignId},{$push:{
+      entries:{userId:address}
+    }})
   }
 
 
 return await JoinedCampaignsModel.find({address})
 
 
-
-
-// return;
-
-//   const user = await UserModel.findOne({ address });
-//   const userData = JSON.parse(JSON.stringify(user));
-
-//   let foundCampaign = userData.campaignsJoined.find(
-//     (cmp) => cmp.campaignId === campaignId
-//   );
-//   if (foundCampaign) {
-//     console.log("Found a campaign");
-//     //if task id is already exists, don't push
-//     if (foundCampaign.tasksCompleted.indexOf(taskId) === -1) {
-//       foundCampaign.tasksCompleted.push(taskId);
-//     }
-//     const campaignObj = await CampaignModel.findOne({ _id: campaignId });
-
-//     if (
-//       foundCampaign.tasksCompleted &&
-//       foundCampaign.tasksCompleted.length === campaignObj.tasks.length
-//     ) {
-//       foundCampaign.allTasksCompleted = true;
-//       foundCampaign.completedTime = new Date().getTime().toString();
-//     }
-//     const updatedUser = await UserModel.findOneAndUpdate(
-//       { address },
-//       { $set: { "campaignsJoined.$[camp]": foundCampaign } },
-//       { new: true, arrayFilters: [{ "camp.campaignId": { $eq: campaignId } }] }
-//     );
-//     console.log(updatedUser.campaignsJoined);
-
-//     return updatedUser.campaignsJoined;
-//   } else {
-//     console.log("Campaign Not Found");
-
-//     const campaignObj = await CampaignModel.findOne({ _id: campaignId });
-//     foundCampaign = {
-//       campaignId,
-//       allTasksCompleted: false,
-//       tasksCompleted: [taskId],
-//       totalPoints: campaignObj.totalPoints,
-//     };
-//     console.log({ campaignObj, foundCampaign });
-//     if (
-//       foundCampaign.tasksCompleted &&
-//       foundCampaign.tasksCompleted.length === campaignObj.tasks.length
-//     ) {
-//       foundCampaign.allTasksCompleted = true;
-//       foundCampaign.completedTime = new Date().getTime().toString();
-//     }
-//     const updatedUser = await UserModel.findOneAndUpdate(
-//       { address },
-//       { $push: { campaignsJoined: foundCampaign } },
-//       { new: true }
-//     );
-//     console.log(
-//       updatedUser.campaignsJoined.find((c) => c.campaignId === campaignId)
-//     );
-
-//     return updatedUser.campaignsJoined;
-//   }
 };
 taskRouter.get("/task/discord", verifyJWT, async (req, res) => {
   const { campaignId, taskId, serverId } = req.query;
@@ -315,6 +256,7 @@ taskRouter.get("/task/telegram", verifyJWT, async (req, res) => {
 taskRouter.get("/reset/all", async (req, res) => {
   await UserModel.updateMany({}, { completedTasks: [], campaignsJoined: [] });
   await JoinedCampaignsModel.deleteMany({});
+  await CampaignModel.updateMany({},{entries:[]})
   await  CampaignManagerModel.deleteMany({})
   // await TelegramModel.updateMany({}, { members: [] });
   //  await CampaignModel.deleteMany({})

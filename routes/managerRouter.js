@@ -59,20 +59,22 @@ managerRouter.get("/manager/data", verifyManagerJWT, async (req, res) => {
   }
 });
 
-managerRouter.post("/manager/campaign/new",verifyManagerJWT,upload.single("campaign-image"),async (req,res)=>{
+managerRouter.post("/manager/campaign/new",verifyManagerJWT,upload.fields([{name:"campaign-image"},{name:"brand-logo"}]),async (req,res)=>{
   try{
-    const imageName =req.file.filename
-    const result = await uploadImage(path.join(__dirname,"../uploads/",imageName))
-    console.log(result.url);
+    const campaignImage =req.files["campaign-image"][0].filename
+    const brandLogo =req.files["brand-logo"][0].filename
+    const {url:campaignImageURL} = await uploadImage(path.join(__dirname,"../uploads/",campaignImage))
+    const {url:brandLogoURL} = await uploadImage(path.join(__dirname,"../uploads/",brandLogo))
     const data = (req.body)
     const tasks = JSON.parse(req.body.tasks)
-    const campaignData = {...data,tasks,image:result.url,managerEmail:req.email}
+    const campaignData = {...data,tasks,image:campaignImageURL,managerEmail:req.email,brandLogo:brandLogoURL}
     const newCamp = new UnapprovedCampaignModel(campaignData)
     const saved =await  newCamp.save()
-    await CampaignManagerModel.updateOne({username:req.username},{$addToSet:{campaignsCreated:saved._id}})
+    await CampaignManagerModel.updateOne({email:req.email},{$addToSet:{campaignsCreated:saved._id}})
     res.send({success:true,addedCampaign:saved})
   }catch (e) {
-    return res.status(500).send({ success: false });
+    console.log(e)
+    return res.status(500).send({ success: false,error:e,message:"Some error occurred!" });
   }
 })
 module.exports = managerRouter;
