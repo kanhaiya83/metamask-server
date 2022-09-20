@@ -52,8 +52,9 @@ managerRouter.post("/manager/login", async (req, res) => {
 });
 managerRouter.get("/manager/data", verifyManagerJWT, async (req, res) => {
   try {
-    const campaignsList = await CampaignModel.find({});
-    return res.send({ success: true, campaignsList });
+    const  managerData= await CampaignManagerModel.findOne({email:req.email},{password:0})
+    // const campaignsList = await CampaignModel.find({});
+    return res.send({ success: true, managerData });
   } catch (e) {
     return res.status(500).send({ success: false });
   }

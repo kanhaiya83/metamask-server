@@ -153,7 +153,10 @@ const CampaignManagerSchema = new Schema({
   campaignsCreated:[{campaignId:{type:String}}],
   image:{type:String},
   name:{type:String},
-  email:{type:String}
+  email:{type:String},
+  brandName:{type:String,default:""},
+  brandURL:{type:String,default:""},
+  brandLogo:{type:String,default:""},
 });
 const UserModel = mongoose.model("User", userSchema);
 const CampaignModel = mongoose.model("Campaign", campaignSchema);
