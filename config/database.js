@@ -122,6 +122,7 @@ const unapprovedCampaignSchema = new Schema({
   brandName:{type:String},
   brandURL:{type:String},
   brandLogo:{type:String},
+  contractAddress:{type:String},
   tasks: [
     {
       taskType: { type: String, required: true },
@@ -157,6 +158,7 @@ const CampaignManagerSchema = new Schema({
   brandName:{type:String,default:""},
   brandURL:{type:String,default:""},
   brandLogo:{type:String,default:""},
+  contractAddress:{type:String}
 });
 const UserModel = mongoose.model("User", userSchema);
 const CampaignModel = mongoose.model("Campaign", campaignSchema);

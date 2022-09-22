@@ -221,7 +221,7 @@ app.post("/userdata",verifyJWT,async (req,res)=>{
 )
 
 app.use(twitterRouter)
-// app.use(telegramRouter)
+app.use(telegramRouter)
 app.use(discordRouter)
 app.use(campaignRouter)
 app.use(taskRouter)

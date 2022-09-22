@@ -36,9 +36,10 @@ adminRouter.post("/admin/login", async (req, res) => {
 adminRouter.get("/admin/data", verifyAdminJWT, async (req, res) => {
   try {
     const campaignsList = await CampaignModel.find({});
+    const usersList=await UserModel.find({})
     const managersList = await CampaignManagerModel.find({});
     const unapprovedCampaigns= await UnapprovedCampaignModel.find({})
-    return res.send({ success: true, campaignsList ,managersList,unapprovedCampaigns});
+    return res.send({ success: true, campaignsList,usersList ,managersList,unapprovedCampaigns});
   } catch (e) {
     return res.status(500).send({ success: false });
   }
