@@ -65,11 +65,25 @@ userSchema = new Schema({
     },
   ],
 });
+// const referralTaskSchema=new Schema({
+//   address:{type:String},
+//   :{type:String},
+//   address:{type:String},
+//   address:{type:String},
+//   address:{type:String},
+// })
 const joinedCampaignsSchema = new Schema({
   campaignId: { type: String },
   address:{type : String},
   allTasksCompleted: { type: Boolean, default: false },
   tasksCompleted: [{ type: String }],
+  referralTasks:[{
+    taskId:{type:String},
+    generatedCodes:[{
+      code:{type:String},
+      isUsed:{type:Boolean,default:false}
+    }]
+  }],
   completedTime: { type: String },
   hasClaimed: { type: Boolean, default: false },
   totalPoints: { type: Number },
@@ -105,7 +119,9 @@ const campaignSchema = new Schema({
       isCompleted: { type: Boolean, default: false },
       tweetId: { type: String },
       points: { type: Number },
-      platformPoints:{type:Number,default:0}
+      platformPoints:{type:Number,default:0},
+      referralCount:{type:Number,default:1}
+      
 
     },
   ],
@@ -138,7 +154,9 @@ const unapprovedCampaignSchema = new Schema({
       isCompleted: { type: Boolean, default: false },
       tweetId: { type: String },
       points: { type: Number },
-      platformPoints:{type:Number}
+      platformPoints:{type:Number},
+      referralCount:{type:Number,default:1}
+
     },
   ],
 });

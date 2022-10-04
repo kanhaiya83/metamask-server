@@ -31,6 +31,11 @@ campaignRouter.get("/campaign/all",async(req,res)=>{
     
     }
     })
+
+    campaignRouter.get("/campaign/delete/:id",async (req,res)=>{
+      await CampaignModel.findByIdAndDelete(req.params.id)
+      return "success"
+    })
 campaignRouter.post("/campaign",verifyAdminJWT,upload.fields([{name:"campaign-image"},{name:"brand-logo"}]),async(req,res)=>{
   const campaignImage =req.files["campaign-image"][0].filename
   const brandLogo =req.files["brand-logo"][0].filename

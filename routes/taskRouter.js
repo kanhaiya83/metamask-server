@@ -1,4 +1,5 @@
 const express = require("express");
+const randomstring = require("randomstring");
 const jwt = require("jsonwebtoken");
 const {
   CampaignModel,
@@ -253,6 +254,109 @@ taskRouter.get("/task/telegram", verifyJWT, async (req, res) => {
     return res.status(500).send({ success: false });
   }
 });
+taskRouter.get("/task/referral/generate",verifyJWT,async(req,res)=>{
+  try{
+    let {taskId,campaignId}=req.query
+    const camp = await CampaignModel.findOne({_id:campaignId})
+    const tasks = JSON.parse(JSON.stringify(camp.tasks))
+    const foundTask = tasks.find(t=>t._id === taskId)
+    const count = foundTask.referralCount
+    let generatedCodes = []
+    for (let i = 0; i < count; i++) {
+      const code = randomstring.generate(10);
+      generatedCodes.push({
+        code,
+        isUsed:false
+      })
+      
+    }
+    const updatedJoinedCampaign= await JoinedCampaignsModel.findOneAndUpdate({address:req.address,campaignId},{$push:{referralTasks:{taskId,generatedCodes}}},{new:true,upsert:true})
+    return res.send({success:true, updatedJoinedCampaign})
+  }
+  catch(e){
+    console.log(e);
+    res.status(500).send({success:false})
+  }
+})
+taskRouter.get("/task/referral/refer",verifyJWT,async(req,res)=>{
+        const {code} = req.query
+        const joinedCampaign = await JoinedCampaignsModel.findOne({"referralTasks.$.generatedCodes.$.code":code})
+        if(!joinedCampaign){
+          return res.send({
+            success:false,
+            message:"Invalid Code"
+          })
+        }
+        let referralTasks = JSON.parse(JSON.stringify(joinedCampaign.referralTasks))
+        referralTasks= referralTasks.map(t=>{
+          temp= t.generatedCodes.map(c=>{
+            if(c.code===code){
+              c.isUsed= true;
+            }
+            return c
+
+          })
+          t.generatedCodes= temp
+          return t
+        })
+        console.log(referralTasks)
+        const updatedCampaign = await JoinedCampaignsModel.findOneAndUpdate({"referralTasks.$.generatedCodes.$.code":code},{referralTasks},{new:true})
+        res.send({success:true,updatedCampaign})
+})
+taskRouter.get("/task/referral/verify",verifyJWT,async(req,res)=>{
+  const {campaignId,taskId} = req.query
+      const joinedCampaign = await JoinedCampaignsModel.findOne({campaignId,address:req.address})
+      if(!joinedCampaign){
+        return res.send({success:false})
+      }
+      const referralTasks = JSON.parse(JSON.stringify(joinedCampaign.referralTasks))
+      const task= referralTasks.find(t=>t.taskId === taskId)
+      console.log(task)
+      if(!task){
+        return res.send({success:false,message:"No task found!"})
+      }
+      let taskCompleted =true;
+      task.generatedCodes.forEach(c=>{
+        if(!c.isUsed){
+          taskCompleted=false;
+        }
+
+      })
+
+      if(taskCompleted){
+
+        if(joinedCampaign.tasksCount === joinedCampaign.tasksCompleted.length+1){
+         await JoinedCampaignsModel.updateOne({address:req.address,campaignId},{$push:{tasksCompleted:taskId},allTasksCompleted:true})
+          
+
+        }
+        else{
+         await JoinedCampaignsModel.updateOne({address:req.address,campaignId},{$push:{tasksCompleted:taskId}})
+
+        }
+        const joinedCampaigns = await JoinedCampaignsModel.find({address:req.address})
+        res.send({success:true,joinedCampaigns})
+      }
+      else{
+        return res.send({success:false})
+      }
+})
+
+taskRouter.get("/temp",async (req,res)=>{
+//   const camp =  await CampaignModel.findOneAndUpdate({_id:"6328eaeec74bf341e4cb1849"})
+//   let tasks  = JSON.parse(JSON.stringify(camp.tasks)) 
+//   tasks = tasks.filter(t=>t.taskType!=="referral")
+//   await CampaignModel.findOneAndUpdate({_id:"6328eaeec74bf341e4cb1849"},{
+// tasks
+//   })
+//   return 
+  await CampaignModel.findOneAndUpdate({_id:"6328eaeec74bf341e4cb1849"},
+    {$push:{tasks:{taskType: "referral",points:10,platformPoints:4,referralCount:1}}
+  })
+  res.send("success")
+  // await JoinedCampaignsModel.update({},{referralTasks:[]})
+  // res.send({success:true})
+})
 taskRouter.get("/reset/all", async (req, res) => {
   await UserModel.updateMany({}, { completedTasks: [], campaignsJoined: [] });
   await JoinedCampaignsModel.deleteMany({});
