@@ -99,6 +99,7 @@ const campaignSchema = new Schema({
   brandName:{type:String},
   brandURL:{type:String},
   brandLogo:{type:String},
+  isFeatured:{type:Boolean,default:false},
   entries:[{
     userId:{type:String}
   }],
