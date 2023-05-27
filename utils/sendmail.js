@@ -13,6 +13,7 @@ console.log({GOOGLE_CLIENT_ID,
     GOOGLE_REDIRECT_URI,
     GOOGLE_REFRESH_TOKEN});
 async function sendMail(receiver,subject,body) {
+  console.log({subject,receiver,body:body.toString()});
   try {
     
     const res = await axios.post("https://api.brevo.com/v3/smtp/email",{
@@ -23,10 +24,10 @@ async function sendMail(receiver,subject,body) {
         email:receiver
       }],
       "subject":subject,
-   "htmlContent":body
+   "htmlContent":"<p>"+body.toString() +"</p>"
     },{headers:{
       accept:"application/json",
-      "api-key":"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",
+      "api-key":"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",
       "content-type": "application/json"
     }})
 
@@ -38,6 +39,7 @@ console.log(res.data);
   }
 }
 
-// sendMail("kanhaiya2778@gmail.com","hello","hello")
+// sendMail("ankitdhaker000@gmail.com","hello",'Your Airlyft Campaign Manager password: "uzzlPmecR9KRt3qQ\n' +
+//     '    Login here : https://demo-202.netlify.app/manager/login')
 
 module.exports = sendMail
