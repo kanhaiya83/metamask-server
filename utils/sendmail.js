@@ -18,7 +18,7 @@ async function sendMail(receiver,subject,body) {
    "htmlContent":"<p>"+body.toString() +"</p>"
     },{headers:{
       accept:"application/json",
-      "api-key":"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",
+      "api-key":process.env.BREVO_API_KEY,
       "content-type": "application/json"
     }})
 
