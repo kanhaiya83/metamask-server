@@ -2,16 +2,7 @@ require("dotenv").config()
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 const axios = require("axios")
-// These id's and secrets should come from .env file.
- const {GOOGLE_CLIENT_ID,
- GOOGLE_CLIENT_SECRET,
- GOOGLE_REDIRECT_URI,
- GOOGLE_REFRESH_TOKEN
-} = process.env
-console.log({GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET,
-    GOOGLE_REDIRECT_URI,
-    GOOGLE_REFRESH_TOKEN});
+
 async function sendMail(receiver,subject,body) {
   console.log({subject,receiver,body:body.toString()});
   try {

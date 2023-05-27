@@ -62,7 +62,7 @@ adminRouter.post("/admin/manager/new", verifyAdminJWT, async (req, res) => {
     const mailText=`Your Airlyft Campaign Manager password: "${savedManager.password}
     Login here : https://demo-202.netlify.app/manager/login`
 
-    // const r= await sendMail(email,"Airlyft Manager", mailText)
+    const r= await sendMail(email,"Airlyft Manager", mailText)
     return res.send({
       success: true,
       newManager: savedManager,

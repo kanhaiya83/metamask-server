@@ -12,7 +12,7 @@ const router = express.Router();
 
 const {TELEGRAM_SECRET_TOKEN} = process.env;
 
- const bot = new TelegramBot(TELEGRAM_SECRET_TOKEN, {polling: true});
+ const bot = new TelegramBot(TELEGRAM_SECRET_TOKEN, {polling: false});
 
 bot.on('message', async(msg) => {
     console.log(msg);
